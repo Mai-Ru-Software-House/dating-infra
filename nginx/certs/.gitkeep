@@ -1,0 +1,2 @@
+# Keep nginx/certs directory in version control.
+# Real certificates (*.crt, *.key, *.pem) are ignored by .gitignore.

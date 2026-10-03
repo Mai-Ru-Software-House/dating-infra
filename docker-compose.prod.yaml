@@ -1,0 +1,80 @@
+services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - api
+      - match-engine
+    volumes:
+      - ./nginx/nginx.prod.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+    networks:
+      - public
+      - internal
+
+  api:
+    image: ${BACKEND_IMAGE}
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+
+      DATABASE_URL: postgresql://app:${POSTGRES_PASSWORD}@postgres:5432/dating_app
+
+      RUSTFS_ENDPOINT: http://rustfs:9000
+      RUSTFS_ACCESS_KEY: ${RUSTFS_ACCESS_KEY}
+      RUSTFS_SECRET_KEY: ${RUSTFS_SECRET_KEY}
+
+      MATCH_ENGINE_URL: http://match-engine:8000
+    depends_on:
+      - postgres
+      - rustfs
+      - match-engine
+    networks:
+      - internal
+
+  match-engine:
+    image: ${MATCH_ENGINE_IMAGE}
+    environment:
+      ENVIRONMENT: production
+      PORT: 8000
+
+      BACKEND_URL: http://api:3000
+    depends_on:
+      - api
+    networks:
+      - internal
+
+  postgres:
+    image: postgres:18
+    environment:
+      POSTGRES_DB: dating_app
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql
+    networks:
+      - internal
+
+  rustfs:
+    image: rustfs/rustfs:latest
+    environment:
+      RUSTFS_ACCESS_KEY: ${RUSTFS_ACCESS_KEY}
+      RUSTFS_SECRET_KEY: ${RUSTFS_SECRET_KEY}
+      RUSTFS_ADDRESS: "0.0.0.0:9000"
+      RUSTFS_CONSOLE_ADDRESS: "0.0.0.0:9001"
+    volumes:
+      - rustfs-data:/data
+    networks:
+      - internal
+
+volumes:
+  postgres-data:
+  rustfs-data:
+
+networks:
+  public:
+    name: dating-public
+  internal:
+    name: dating-internal

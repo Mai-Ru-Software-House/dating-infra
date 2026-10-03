@@ -1,0 +1,23 @@
+# Environment variables and secrets (Mai Ru Coding Standard Rule 4: Never commit secrets)
+.env
+.env.local
+.env.*.local
+
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# SSL Certificates & Private Keys (Keep directory via .gitkeep)
+nginx/certs/*.crt
+nginx/certs/*.key
+nginx/certs/*.pem
+!nginx/certs/.gitkeep
+
+# Docker volumes and persistent state
+postgres-data/
+rustfs-data/
