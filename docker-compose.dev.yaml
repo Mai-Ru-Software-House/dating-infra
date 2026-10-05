@@ -25,6 +25,10 @@ services:
       RUSTFS_SECRET_KEY: ${RUSTFS_SECRET_KEY}
 
       MATCH_ENGINE_URL: ${MATCH_ENGINE_URL:-http://match-engine:8000}
+      
+      ARGON2_MEMORY_COST: ${ARGON2_MEMORY_COST}
+      ARGON2_TIME_COST: ${ARGON2_TIME_COST}
+      ARGON2_PARALLELISM: ${ARGON2_PARALLELISM}
     networks:
       - internal
 

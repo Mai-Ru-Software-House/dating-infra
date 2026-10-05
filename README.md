@@ -1,8 +1,8 @@
-# dating-app-infra
+# dating-infra
 
 > **Online Dating System (SEN-201)**  
 > **Team:** Mai Ru (`Mai-Ru-Software-House`)  
-> **Repository:** [dating-app-infra](https://github.com/Mai-Ru-Software-House/dating-app-infra)
+> **Repository:** [dating-infra](https://github.com/Mai-Ru-Software-House/dating-infra)
 
 Centralized Docker container orchestration, network routing, and local/production infrastructure for the Online Dating System microservices suite.
 
@@ -61,7 +61,7 @@ flowchart TD
 ## Repository Structure
 
 ```text
-dating-app-infra/
+dating-infra/
 ├── .env.example              # Dummy environment variable template (committed)
 ├── .gitignore                # Protects secrets (.env), OS artifacts, and certs
 ├── MaiRu_CodingStandards.md  # Team-wide standards and style specifications
@@ -117,6 +117,9 @@ cp .env.example .env
 | `MATCH_ENGINE_IMAGE`| Docker image tag for Match Engine service | `ghcr.io/mai-ru-software-house/dating-match-engine:dev` |
 | `MATCH_ENGINE_URL`  | Internal Match Engine URL for API service | `http://match-engine:8000` |
 | `BACKEND_URL`       | Internal Backend API URL for Match Engine | `http://api:3000` |
+| `ARGON2_MEMORY_COST`| Argon2 memory cost parameter in KiB | `65536` (64 MiB) |
+| `ARGON2_TIME_COST`  | Argon2 iteration / time cost parameter | `3` |
+| `ARGON2_PARALLELISM`| Argon2 threads / degree of parallelism | `4` |
 
 > [!WARNING]
 > Real passwords, API keys, and certificate files must **never** be committed to version control. The `.gitignore` file enforces this exclusion.
