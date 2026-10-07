@@ -55,6 +55,7 @@ flowchart TD
 | **Match Engine** | Python 3.12+ / FastAPI | High-performance candidate ranking and score computation |
 | **PostgreSQL** | `postgres:18` | Primary relational database for user records, swipes, and chats |
 | **RustFS** | `rustfs/rustfs:latest` | S3-compatible high-performance object storage for photos and media |
+| **Watchtower** | `containrrr/watchtower` | Automated container updater for pulling updated images and restarting services (Dev only) |
 
 ---
 
@@ -120,6 +121,7 @@ cp .env.example .env
 | `ARGON2_MEMORY_COST`| Argon2 memory cost parameter in KiB | `65536` (64 MiB) |
 | `ARGON2_TIME_COST`  | Argon2 iteration / time cost parameter | `3` |
 | `ARGON2_PARALLELISM`| Argon2 threads / degree of parallelism | `4` |
+| `WATCHTOWER_POLL_INTERVAL`| Polling interval (seconds) for auto-updating dev images | `30` |
 
 > [!WARNING]
 > Real passwords, API keys, and certificate files must **never** be committed to version control. The `.gitignore` file enforces this exclusion.
@@ -148,6 +150,21 @@ docker compose -f docker-compose.dev.yaml ps
 
 ```bash
 docker compose -f docker-compose.dev.yaml logs -f
+```
+
+#### Automatic Container Updates (Watchtower)
+
+The development compose includes a **Watchtower** service that continuously polls the GitHub Container Registry (GHCR) and automatically recreates running containers whenever a new image is pushed:
+
+- **Targeted Services:** Only services with label `com.centurylinklabs.watchtower.enable=true` (`api` and `match-engine`) are monitored and updated automatically.
+- **Polling Interval:** Defaults to 30 seconds (configurable via `WATCHTOWER_POLL_INTERVAL` in `.env`).
+- **Cleanup:** Automatically purges superseded, dangling Docker images to preserve host disk space (`WATCHTOWER_CLEANUP=true`).
+- **Authentication:** Uses the host Docker credentials mounted from `~/.docker/config.json` (created during `docker login ghcr.io`).
+
+To follow Watchtower auto-update logs:
+
+```bash
+docker compose -f docker-compose.dev.yaml logs -f watchtower
 ```
 
 #### Tear Down Development Environment
@@ -197,3 +214,4 @@ docker compose -f docker-compose.prod.yaml up -d --remove-orphans
 | **PostgreSQL** | `5432` | `5432` | *internal only* | `postgresql://app@localhost:5432/dating_app` |
 | **RustFS (S3 API)** | `9000` | `9000` | *internal only* | `http://localhost:9000` |
 | **RustFS Console** | `9001` | `9001` | *internal only* | `http://localhost:9001` |
+| **Watchtower** | *none* | *none* | *not deployed* | Docker socket daemon `/var/run/docker.sock` |
