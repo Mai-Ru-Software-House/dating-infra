@@ -122,7 +122,7 @@ cp .env.example .env
 | `ARGON2_TIME_COST`  | Argon2 iteration / time cost parameter | `3` |
 | `ARGON2_PARALLELISM`| Argon2 threads / degree of parallelism | `4` |
 | `JWT_SECRET` | Secret used to sign login tokens. Required, no default. Generate one with `openssl rand -hex 32` | `your_long_random_jwt_secret_here` |
-| `CORS_ORIGINS` | Comma separated list of app origins allowed by CORS | `` |
+| `CORS_ORIGINS` | Comma separated list of app origins allowed by CORS |  |
 | `RUSTFS_BUCKET` | RustFS bucket for profile photos. The bucket must exist in RustFS | `mairu-photos` |
 | `WATCHTOWER_POLL_INTERVAL`| Polling interval (seconds) for auto-updating dev images | `30` |
 
