@@ -121,7 +121,26 @@ cp .env.example .env
 | `ARGON2_MEMORY_COST`| Argon2 memory cost parameter in KiB | `65536` (64 MiB) |
 | `ARGON2_TIME_COST`  | Argon2 iteration / time cost parameter | `3` |
 | `ARGON2_PARALLELISM`| Argon2 threads / degree of parallelism | `4` |
+| `JWT_SECRET` | Secret used to sign login tokens. Required, no default. Generate one with `openssl rand -hex 32` | `your_long_random_jwt_secret_here` |
+| `CORS_ORIGINS` | Comma separated list of origins allowed by CORS |  |
+| `RUSTFS_BUCKET` | RustFS bucket for profile photos. The bucket must exist in RustFS | `mairu-photos` |
 | `WATCHTOWER_POLL_INTERVAL`| Polling interval (seconds) for auto-updating dev images | `30` |
+
+`JWT_SECRET` has no default on purpose. The `api` container stops at start if it is missing.
+
+#### Optional backend settings
+
+These are not in `.env.example`. Both compose files give them the default below, so set one in `.env` only when you need a different value.
+
+| Variable | Description | Default |
+|---|---|---|
+| `NOMINATIM_URL` | Place name lookup service. The public OpenStreetMap server allows 1 request per second, and the backend limits itself to that | `https://nominatim.openstreetmap.org` |
+| `NOMINATIM_EMAIL` | Contact email sent to OpenStreetMap with each lookup | empty |
+| `ACCESS_TOKEN_TTL_SECONDS` | Life of a login token, in seconds | `900` |
+| `REFRESH_TOKEN_TTL_DAYS` | Life of a refresh token, in days | `30` |
+| `MATCH_ENGINE_TIMEOUT_MS` | How long the API waits for the Match Engine, in milliseconds | `5000` |
+
+Both Nginx files set `client_max_body_size 2m;`, so a 1 MB photo upload reaches the backend. The backend itself refuses a request body over 2 MiB.
 
 > [!WARNING]
 > Real passwords, API keys, and certificate files must **never** be committed to version control. The `.gitignore` file enforces this exclusion.

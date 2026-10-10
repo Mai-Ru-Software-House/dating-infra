@@ -29,6 +29,16 @@ services:
       ARGON2_MEMORY_COST: ${ARGON2_MEMORY_COST}
       ARGON2_TIME_COST: ${ARGON2_TIME_COST}
       ARGON2_PARALLELISM: ${ARGON2_PARALLELISM}
+
+      JWT_SECRET: ${JWT_SECRET}
+      CORS_ORIGINS: ${CORS_ORIGINS:-}
+      RUSTFS_BUCKET: ${RUSTFS_BUCKET:-mairu-photos}
+      NOMINATIM_URL: ${NOMINATIM_URL:-https://nominatim.openstreetmap.org}
+      NOMINATIM_EMAIL: ${NOMINATIM_EMAIL:-}
+
+      ACCESS_TOKEN_TTL_SECONDS: ${ACCESS_TOKEN_TTL_SECONDS:-900}
+      REFRESH_TOKEN_TTL_DAYS: ${REFRESH_TOKEN_TTL_DAYS:-30}
+      MATCH_ENGINE_TIMEOUT_MS: ${MATCH_ENGINE_TIMEOUT_MS:-5000}
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
     networks:
