@@ -31,7 +31,6 @@ services:
       ARGON2_PARALLELISM: ${ARGON2_PARALLELISM}
 
       JWT_SECRET: ${JWT_SECRET}
-      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:8081,http://localhost:19006}
       RUSTFS_BUCKET: ${RUSTFS_BUCKET:-mairu-photos}
       NOMINATIM_URL: ${NOMINATIM_URL:-https://nominatim.openstreetmap.org}
       NOMINATIM_EMAIL: ${NOMINATIM_EMAIL:-}
