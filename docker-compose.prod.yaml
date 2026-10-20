@@ -139,11 +139,12 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
-    volumes:
-      # Accepted (KICS INFO, false positive): the rule flags every named volume,
-      # but postgres-data is only used by this service
-      # kics-scan ignore-line
-      - postgres-data:/var/lib/postgresql
+    # Accepted (KICS INFO, false positive): the rule flags every named volume,
+    # but postgres-data is only used by this service.
+    # On one line on purpose: KICS 2.1.20 skips a kics-scan comment above the
+    # first item of a list, but honors one above a key
+    # kics-scan ignore-line
+    volumes: ["postgres-data:/var/lib/postgresql"]
     networks:
       - internal
 
@@ -165,11 +166,12 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
-    volumes:
-      # Accepted (KICS INFO, false positive): the rule flags every named volume,
-      # but rustfs-data is only used by this service
-      # kics-scan ignore-line
-      - rustfs-data:/data
+    # Accepted (KICS INFO, false positive): the rule flags every named volume,
+    # but rustfs-data is only used by this service.
+    # On one line on purpose: KICS 2.1.20 skips a kics-scan comment above the
+    # first item of a list, but honors one above a key
+    # kics-scan ignore-line
+    volumes: ["rustfs-data:/data"]
     networks:
       - internal
 
