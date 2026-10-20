@@ -37,6 +37,9 @@ jobs:
             exit 1
           fi
 
+      # Fails the job on any CRITICAL or HIGH finding so new problems are blocked (--fail-on is an
+      # exact list, "high" alone would let CRITICAL pass). Accepted findings are marked with
+      # "# kics-scan ignore-line" in the compose files
       - name: Run KICS
         run: |
           set -o pipefail
@@ -44,7 +47,7 @@ jobs:
             -v "$GITHUB_WORKSPACE:/path" -w /path \
             "$KICS_IMAGE" scan -p /path \
             --no-color --no-progress \
-            --ignore-on-exit results \
+            --fail-on critical,high \
             --exclude-paths static-analysis/ \
             -o /path/results --report-formats json \
             2>&1 | tee "kics_${RUN_NAME}_output.txt"
