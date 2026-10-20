@@ -1,0 +1,60 @@
+name: KICS
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      run:
+        description: "Run name used in the output file and artifact name (e.g. run1, run2)"
+        type: string
+        default: ci
+
+permissions:
+  contents: read
+
+env:
+  # Newest v2 tag on Docker Hub, pinned by digest (v2.2.0 is released on GitHub but not yet pushed to Docker Hub)
+  KICS_IMAGE: checkmarx/kics:v2.1.20@sha256:3e5a268eb8adda2e5a483c9359ddfc4cd520ab856a7076dc0b1d8784a37e2602
+  # inputs.run is empty on push and pull_request runs
+  RUN_NAME: ${{ inputs.run || 'ci' }}
+
+jobs:
+  kics:
+    name: KICS scan
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Validate run name
+        run: |
+          if ! [[ "$RUN_NAME" =~ ^[A-Za-z0-9_-]+$ ]]; then
+            echo "::error::run must only contain letters, digits, '-' or '_'"
+            exit 1
+          fi
+
+      - name: Run KICS
+        run: |
+          set -o pipefail
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE:/path" -w /path \
+            "$KICS_IMAGE" scan -p /path \
+            --no-color --no-progress \
+            --ignore-on-exit results \
+            --exclude-paths static-analysis/ \
+            -o /path/results --report-formats json \
+            2>&1 | tee "kics_${RUN_NAME}_output.txt"
+
+      - name: Upload KICS output
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: kics-${{ env.RUN_NAME }}
+          path: |
+            kics_${{ env.RUN_NAME }}_output.txt
+            results/results.json
+          if-no-files-found: error
