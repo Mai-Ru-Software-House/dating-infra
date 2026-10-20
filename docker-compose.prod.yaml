@@ -1,12 +1,38 @@
 services:
   nginx:
     image: nginx:alpine
+    security_opt:
+      - "no-new-privileges:true"
+    # The root master process keeps CHOWN, DAC_OVERRIDE, KILL, SETGID and SETUID to prepare its
+    # temp dirs, read the mounted config and certs, and start and signal the nginx workers.
+    # NET_BIND_SERVICE is dropped: Docker 20.10+ lets containers bind ports below 1024 without it
+    cap_drop:
+      - AUDIT_WRITE
+      - FOWNER
+      - FSETID
+      - MKNOD
+      - NET_BIND_SERVICE
+      - NET_RAW
+      - SETFCAP
+      - SETPCAP
+      - SYS_CHROOT
+    # Accepted (KICS MEDIUM): public gateway, 80 and 443 must be open to the internet
+    # kics-scan ignore-line
     ports:
       - "80:80"
       - "443:443"
+    # Checks nginx and the proxy to api; the image has busybox wget
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/api/v1/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     depends_on:
-      - api
-      - match-engine
+      api:
+        condition: service_healthy
+      match-engine:
+        condition: service_healthy
     volumes:
       - ./nginx/nginx.prod.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/certs:/etc/nginx/certs:ro
@@ -16,6 +42,11 @@ services:
 
   api:
     image: ${BACKEND_IMAGE}
+    security_opt:
+      - "no-new-privileges:true"
+    # Runs as the non-root user bun and only binds port 3000
+    cap_drop:
+      - ALL
     environment:
       NODE_ENV: production
       PORT: 3000
@@ -41,45 +72,106 @@ services:
       ACCESS_TOKEN_TTL_SECONDS: ${ACCESS_TOKEN_TTL_SECONDS:-900}
       REFRESH_TOKEN_TTL_DAYS: ${REFRESH_TOKEN_TTL_DAYS:-30}
       MATCH_ENGINE_TIMEOUT_MS: ${MATCH_ENGINE_TIMEOUT_MS:-5000}
+    # The image has no curl or wget, so bun does the request
+    healthcheck:
+      test: ["CMD", "bun", "-e", "fetch('http://127.0.0.1:3000/api/v1/health').then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    # Migrations run when the container starts, so the database must be ready first
     depends_on:
-      - postgres
-      - rustfs
-      - match-engine
+      postgres:
+        condition: service_healthy
+      rustfs:
+        condition: service_healthy
+      match-engine:
+        condition: service_healthy
     networks:
       - internal
 
+  # No depends_on: api. api already depends on match-engine, and the two only call
+  # each other at request time (depending both ways is a cycle and prod cannot start)
   match-engine:
     image: ${MATCH_ENGINE_IMAGE}
+    security_opt:
+      - "no-new-privileges:true"
+    # Only binds port 8000 and reads root-owned files, so it needs no capabilities
+    cap_drop:
+      - ALL
     environment:
       ENVIRONMENT: production
       PORT: 8000
 
       BACKEND_URL: http://api:3000
-    depends_on:
-      - api
+    # The image has no curl or wget, so python does the request
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=4)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     networks:
       - internal
 
   postgres:
     image: postgres:18
+    security_opt:
+      - "no-new-privileges:true"
+    # The entrypoint needs CHOWN, DAC_OVERRIDE, FOWNER, FSETID, SETGID and SETUID to fix
+    # the data directory and switch to the postgres user, so only the rest is dropped
+    cap_drop:
+      - AUDIT_WRITE
+      - KILL
+      - MKNOD
+      - NET_BIND_SERVICE
+      - NET_RAW
+      - SETFCAP
+      - SETPCAP
+      - SYS_CHROOT
     environment:
       POSTGRES_DB: dating_app
       POSTGRES_USER: app
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    volumes:
-      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "app", "-d", "dating_app"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    # Accepted (KICS INFO, false positive): the rule flags every named volume,
+    # but postgres-data is only used by this service.
+    # On one line on purpose: KICS 2.1.20 skips a kics-scan comment above the
+    # first item of a list, but honors one above a key
+    # kics-scan ignore-line
+    volumes: ["postgres-data:/var/lib/postgresql"]
     networks:
       - internal
 
   rustfs:
     image: rustfs/rustfs:latest
+    security_opt:
+      - "no-new-privileges:true"
+    # Runs as the non-root user rustfs and only binds ports above 1024
+    cap_drop:
+      - ALL
     environment:
       RUSTFS_ACCESS_KEY: ${RUSTFS_ACCESS_KEY}
       RUSTFS_SECRET_KEY: ${RUSTFS_SECRET_KEY}
       RUSTFS_ADDRESS: "0.0.0.0:9000"
       RUSTFS_CONSOLE_ADDRESS: "0.0.0.0:9001"
-    volumes:
-      - rustfs-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://127.0.0.1:9000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    # Accepted (KICS INFO, false positive): the rule flags every named volume,
+    # but rustfs-data is only used by this service.
+    # On one line on purpose: KICS 2.1.20 skips a kics-scan comment above the
+    # first item of a list, but honors one above a key
+    # kics-scan ignore-line
+    volumes: ["rustfs-data:/data"]
     networks:
       - internal
 

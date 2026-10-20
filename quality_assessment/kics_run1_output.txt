@@ -1,0 +1,515 @@
+Unable to find image 'checkmarx/kics:v2.1.20@sha256:3e5a268eb8adda2e5a483c9359ddfc4cd520ab856a7076dc0b1d8784a37e2602' locally
+docker.io/checkmarx/kics@sha256:3e5a268eb8adda2e5a483c9359ddfc4cd520ab856a7076dc0b1d8784a37e2602: Pulling from checkmarx/kics
+02fc55a9c757: Pulling fs layer
+174181e727b5: Pulling fs layer
+3f02fc482423: Pulling fs layer
+1d53393b78f0: Pulling fs layer
+2a4da0691147: Pulling fs layer
+7c6e71c1fdfd: Pulling fs layer
+a45907cabfcb: Pulling fs layer
+83aaad0499db: Pulling fs layer
+b287abf0b515: Pulling fs layer
+cdea145aa115: Pulling fs layer
+8f59897653b5: Pulling fs layer
+7ad0b01d93ed: Pulling fs layer
+e9095f580f42: Pulling fs layer
+9f56cec7f259: Pulling fs layer
+8e5d4bb15359: Pulling fs layer
+aae0cd2bed42: Pulling fs layer
+970b42807d4b: Pulling fs layer
+ec1edc00c3f9: Pulling fs layer
+4f4fb700ef54: Pulling fs layer
+1d53393b78f0: Waiting
+2a4da0691147: Waiting
+7c6e71c1fdfd: Waiting
+a45907cabfcb: Waiting
+83aaad0499db: Waiting
+b287abf0b515: Waiting
+cdea145aa115: Waiting
+7ad0b01d93ed: Waiting
+8f59897653b5: Waiting
+e9095f580f42: Waiting
+9f56cec7f259: Waiting
+8e5d4bb15359: Waiting
+aae0cd2bed42: Waiting
+970b42807d4b: Waiting
+4f4fb700ef54: Waiting
+ec1edc00c3f9: Waiting
+3f02fc482423: Verifying Checksum
+3f02fc482423: Download complete
+02fc55a9c757: Verifying Checksum
+02fc55a9c757: Download complete
+174181e727b5: Verifying Checksum
+174181e727b5: Download complete
+02fc55a9c757: Pull complete
+1d53393b78f0: Verifying Checksum
+1d53393b78f0: Download complete
+2a4da0691147: Verifying Checksum
+2a4da0691147: Download complete
+7c6e71c1fdfd: Download complete
+a45907cabfcb: Download complete
+83aaad0499db: Verifying Checksum
+83aaad0499db: Download complete
+b287abf0b515: Verifying Checksum
+b287abf0b515: Download complete
+8f59897653b5: Verifying Checksum
+8f59897653b5: Download complete
+174181e727b5: Pull complete
+cdea145aa115: Verifying Checksum
+cdea145aa115: Download complete
+3f02fc482423: Pull complete
+1d53393b78f0: Pull complete
+e9095f580f42: Verifying Checksum
+e9095f580f42: Download complete
+2a4da0691147: Pull complete
+7c6e71c1fdfd: Pull complete
+a45907cabfcb: Pull complete
+83aaad0499db: Pull complete
+8e5d4bb15359: Verifying Checksum
+8e5d4bb15359: Download complete
+aae0cd2bed42: Verifying Checksum
+aae0cd2bed42: Download complete
+b287abf0b515: Pull complete
+7ad0b01d93ed: Verifying Checksum
+7ad0b01d93ed: Download complete
+9f56cec7f259: Verifying Checksum
+9f56cec7f259: Download complete
+970b42807d4b: Download complete
+ec1edc00c3f9: Verifying Checksum
+ec1edc00c3f9: Download complete
+4f4fb700ef54: Verifying Checksum
+4f4fb700ef54: Download complete
+cdea145aa115: Pull complete
+8f59897653b5: Pull complete
+7ad0b01d93ed: Pull complete
+e9095f580f42: Pull complete
+9f56cec7f259: Pull complete
+8e5d4bb15359: Pull complete
+aae0cd2bed42: Pull complete
+970b42807d4b: Pull complete
+ec1edc00c3f9: Pull complete
+4f4fb700ef54: Pull complete
+Digest: sha256:3e5a268eb8adda2e5a483c9359ddfc4cd520ab856a7076dc0b1d8784a37e2602
+Status: Downloaded newer image for checkmarx/kics@sha256:3e5a268eb8adda2e5a483c9359ddfc4cd520ab856a7076dc0b1d8784a37e2602
+
+                                                                                                                                                   
+                                                                                                                                                                                                    
+   MLLLLLM             MLLLLLLLLL   LLLLLLL             KLLLLLLLLLLLLLLLL       LLLLLLLLLLLLLLLLLLLLLLL 
+   MMMMMMM           MMMMMMMMMML    MMMMMMMK       LMMMMMMMMMMMMMMMMMMMML   KLMMMMMMMMMMMMMMMMMMMMMMMMM 
+   MMMMMMM         MMMMMMMMML       MMMMMMMK     LMMMMMMMMMMMMMMMMMMMMMML  LMMMMMMMMMMMMMMMMMMMMMMMMMMM 
+   MMMMMMM      MMMMMMMMMML         MMMMMMMK   LMMMMMMMMMMMMMMMMMMMMMMMML LMMMMMMMMMMMMMMMMMMMMMMMMMMMM 
+   MMMMMMM    LMMMMMMMMML           MMMMMMMK  LMMMMMMMMMLLMLLLLLLLLLLLLLL LMMMMMMMLLLLLLLLLLLLLLLLLLLLM 
+   MMMMMMM  MMMMMMMMMLM             MMMMMMMK LMMMMMMMM                    LMMMMMML                      
+   MMMMMMMLMMMMMMMML                MMMMMMMK MMMMMMML                     LMMMMMMMMLLLLLLLLLLLLLMLL     
+   MMMMMMMMMMMMMMMM                 MMMMMMMK MMMMMML                       LMMMMMMMMMMMMMMMMMMMMMMMMML  
+   MMMMMMMMMMMMMMMMMM               MMMMMMMK MMMMMMM                         LMMMMMMMMMMMMMMMMMMMMMMMML 
+   MMMMMMM KLMMMMMMMMML             MMMMMMMK LMMMMMMM                                          MMMMMMMML
+   MMMMMMM    LMMMMMMMMMM           MMMMMMMK LMMMMMMMMLL                                        MMMMMMML
+   MMMMMMM      LMMMMMMMMMLL        MMMMMMMK  LMMMMMMMMMMMMMMMMMMMMMMMMML LLLLLLLLLLLLLLLLLLLLMMMMMMMMMM
+   MMMMMMM        MMMMMMMMMMML      MMMMMMMK   MMMMMMMMMMMMMMMMMMMMMMMMML LMMMMMMMMMMMMMMMMMMMMMMMMMMMM 
+   MMMMMMM          LLMMMMMMMMML    MMMMMMMK     LLMMMMMMMMMMMMMMMMMMMMML LMMMMMMMMMMMMMMMMMMMMMMMMMML  
+   MMMMMMM             MMMMMMMMMML  MMMMMMMK         KLMMMMMMMMMMMMMMMMML LMMMMMMMMMMMMMMMMMMMMMMMLK    
+                                                                                                            
+                                                                                                                                                                                                                                                                                                                        
+
+
+Scanning with Keeping Infrastructure as Code Secure v2.1.20
+
+
+
+
+
+Shared Volumes Between Containers, Severity: INFO, Results: 4
+Description: Volumes shared between containers can cause data corruption or can be used to share malicious files between containers.
+Platform: DockerCompose
+CWE: 693
+Risk Score: 0.0
+Learn more about this vulnerability: https://docs.kics.io/latest/queries/dockercompose-queries/8c978947-0ff6-485c-b0c2-0bfca6026466
+
+	[1]: docker-compose.dev.yaml:70
+
+		069:     volumes:
+		070:       - postgres-data:/var/lib/postgresql
+		071:     networks:
+
+
+	[2]: docker-compose.prod.yaml:70
+
+		069:     volumes:
+		070:       - postgres-data:/var/lib/postgresql
+		071:     networks:
+
+
+	[3]: docker-compose.dev.yaml:85
+
+		084:     volumes:
+		085:       - rustfs-data:/data
+		086:     networks:
+
+
+	[4]: docker-compose.prod.yaml:82
+
+		081:     volumes:
+		082:       - rustfs-data:/data
+		083:     networks:
+
+
+Security Opt Not Set, Severity: MEDIUM, Results: 11
+Description: Attribute 'security_opt' should be defined.
+Platform: DockerCompose
+CWE: 693
+Risk Score: 5.5
+Learn more about this vulnerability: https://docs.kics.io/latest/queries/dockercompose-queries/610e266e-6c12-4bca-9925-1ed0cd29742b
+
+	[1]: docker-compose.prod.yaml:63
+
+		062: 
+		063:   postgres:
+		064:     image: postgres:18
+
+
+	[2]: docker-compose.dev.yaml:2
+
+		001: services:
+		002:   nginx:
+		003:     image: nginx:alpine
+
+
+	[3]: docker-compose.dev.yaml:47
+
+		046: 
+		047:   match-engine:
+		048:     image: ${MATCH_ENGINE_IMAGE}
+
+
+	[4]: docker-compose.dev.yaml:61
+
+		060: 
+		061:   postgres:
+		062:     image: postgres:18
+
+
+	[5]: docker-compose.dev.yaml:74
+
+		073: 
+		074:   rustfs:
+		075:     image: rustfs/rustfs:latest
+
+
+	[6]: docker-compose.prod.yaml:17
+
+		016: 
+		017:   api:
+		018:     image: ${BACKEND_IMAGE}
+
+
+	[7]: docker-compose.dev.yaml:13
+
+		012: 
+		013:   api:
+		014:     image: ${BACKEND_IMAGE}
+
+
+	[8]: docker-compose.dev.yaml:89
+
+		088: 
+		089:   watchtower:
+		090:     image: containrrr/watchtower
+
+
+	[9]: docker-compose.prod.yaml:51
+
+		050: 
+		051:   match-engine:
+		052:     image: ${MATCH_ENGINE_IMAGE}
+
+
+	[10]: docker-compose.prod.yaml:74
+
+		073: 
+		074:   rustfs:
+		075:     image: rustfs/rustfs:latest
+
+
+	[11]: docker-compose.prod.yaml:2
+
+		001: services:
+		002:   nginx:
+		003:     image: nginx:alpine
+
+
+Privileged Ports Mapped In Container, Severity: MEDIUM, Results: 2
+Description: Privileged ports (1 to 1023) should not be mapped. Also you should drop net_bind_service linux capability from the container unless you absolutely need to use priviledged ports.
+Platform: DockerCompose
+CWE: 269
+Risk Score: 5.2
+Learn more about this vulnerability: https://docs.kics.io/latest/queries/dockercompose-queries/bc2908f3-f73c-40a9-8793-c1b7d5544f79
+
+	[1]: docker-compose.prod.yaml:4
+
+		003:     image: nginx:alpine
+		004:     ports:
+		005:       - "80:80"
+
+
+	[2]: docker-compose.dev.yaml:4
+
+		003:     image: nginx:alpine
+		004:     ports:
+		005:       - "80:80"
+
+
+Healthcheck Not Set, Severity: MEDIUM, Results: 11
+Description: Check containers periodically to see if they are running properly.
+Platform: DockerCompose
+CWE: 703
+Risk Score: 5.1
+Learn more about this vulnerability: https://docs.kics.io/latest/queries/dockercompose-queries/698ed579-b239-4f8f-a388-baa4bcb13ef8
+
+	[1]: docker-compose.dev.yaml:13
+
+		012: 
+		013:   api:
+		014:     image: ${BACKEND_IMAGE}
+
+
+	[2]: docker-compose.dev.yaml:47
+
+		046: 
+		047:   match-engine:
+		048:     image: ${MATCH_ENGINE_IMAGE}
+
+
+	[3]: docker-compose.dev.yaml:61
+
+		060: 
+		061:   postgres:
+		062:     image: postgres:18
+
+
+	[4]: docker-compose.prod.yaml:2
+
+		001: services:
+		002:   nginx:
+		003:     image: nginx:alpine
+
+
+	[5]: docker-compose.prod.yaml:51
+
+		050: 
+		051:   match-engine:
+		052:     image: ${MATCH_ENGINE_IMAGE}
+
+
+	[6]: docker-compose.prod.yaml:63
+
+		062: 
+		063:   postgres:
+		064:     image: postgres:18
+
+
+	[7]: docker-compose.dev.yaml:2
+
+		001: services:
+		002:   nginx:
+		003:     image: nginx:alpine
+
+
+	[8]: docker-compose.dev.yaml:74
+
+		073: 
+		074:   rustfs:
+		075:     image: rustfs/rustfs:latest
+
+
+	[9]: docker-compose.prod.yaml:74
+
+		073: 
+		074:   rustfs:
+		075:     image: rustfs/rustfs:latest
+
+
+	[10]: docker-compose.dev.yaml:89
+
+		088: 
+		089:   watchtower:
+		090:     image: containrrr/watchtower
+
+
+	[11]: docker-compose.prod.yaml:17
+
+		016: 
+		017:   api:
+		018:     image: ${BACKEND_IMAGE}
+
+
+Container Traffic Not Bound To Host Interface, Severity: MEDIUM, Results: 6
+Description: Incoming container traffic should be bound to a specific host interface
+Platform: DockerCompose
+CWE: 693
+Risk Score: 5.2
+Learn more about this vulnerability: https://docs.kics.io/latest/queries/dockercompose-queries/451d79dc-0588-476a-ad03-3c7f0320abb3
+
+	[1]: docker-compose.dev.yaml:49
+
+		048:     image: ${MATCH_ENGINE_IMAGE}
+		049:     ports:
+		050:       - "8000:8000"
+
+
+	[2]: docker-compose.dev.yaml:81
+
+		080:       RUSTFS_CONSOLE_ADDRESS: "0.0.0.0:9001"
+		081:     ports:
+		082:       - "9000:9000"
+
+
+	[3]: docker-compose.dev.yaml:4
+
+		003:     image: nginx:alpine
+		004:     ports:
+		005:       - "80:80"
+
+
+	[4]: docker-compose.dev.yaml:15
+
+		014:     image: ${BACKEND_IMAGE}
+		015:     ports:
+		016:       - "3000:3000"
+
+
+	[5]: docker-compose.prod.yaml:4
+
+		003:     image: nginx:alpine
+		004:     ports:
+		005:       - "80:80"
+
+
+	[6]: docker-compose.dev.yaml:67
+
+		066:       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+		067:     ports:
+		068:       - "5432:5432"
+
+
+Container Capabilities Unrestricted, Severity: MEDIUM, Results: 11
+Description: Some capabilities are not needed in certain (or any) containers. Make sure that you only add capabilities that your container needs. Drop unnecessary capabilities as well.
+Platform: DockerCompose
+CWE: 400
+Risk Score: 6.8
+Learn more about this vulnerability: https://docs.kics.io/latest/queries/dockercompose-queries/ce76b7d0-9e77-464d-b86f-c5c48e03e22d
+
+	[1]: docker-compose.prod.yaml:74
+
+		073: 
+		074:   rustfs:
+		075:     image: rustfs/rustfs:latest
+
+
+	[2]: docker-compose.dev.yaml:61
+
+		060: 
+		061:   postgres:
+		062:     image: postgres:18
+
+
+	[3]: docker-compose.dev.yaml:74
+
+		073: 
+		074:   rustfs:
+		075:     image: rustfs/rustfs:latest
+
+
+	[4]: docker-compose.prod.yaml:51
+
+		050: 
+		051:   match-engine:
+		052:     image: ${MATCH_ENGINE_IMAGE}
+
+
+	[5]: docker-compose.dev.yaml:13
+
+		012: 
+		013:   api:
+		014:     image: ${BACKEND_IMAGE}
+
+
+	[6]: docker-compose.dev.yaml:2
+
+		001: services:
+		002:   nginx:
+		003:     image: nginx:alpine
+
+
+	[7]: docker-compose.dev.yaml:47
+
+		046: 
+		047:   match-engine:
+		048:     image: ${MATCH_ENGINE_IMAGE}
+
+
+	[8]: docker-compose.prod.yaml:2
+
+		001: services:
+		002:   nginx:
+		003:     image: nginx:alpine
+
+
+	[9]: docker-compose.dev.yaml:89
+
+		088: 
+		089:   watchtower:
+		090:     image: containrrr/watchtower
+
+
+	[10]: docker-compose.prod.yaml:17
+
+		016: 
+		017:   api:
+		018:     image: ${BACKEND_IMAGE}
+
+
+	[11]: docker-compose.prod.yaml:63
+
+		062: 
+		063:   postgres:
+		064:     image: postgres:18
+
+
+Volume Has Sensitive Host Directory, Severity: HIGH, Results: 1
+Description: Container has sensitive host directory mounted as a volume
+Platform: DockerCompose
+CWE: 668
+Risk Score: 8.0
+Learn more about this vulnerability: https://docs.kics.io/latest/queries/dockercompose-queries/1c1325ff-831d-43a1-973e-839ae57dfcc0
+
+	[1]: docker-compose.dev.yaml:93
+
+		092:     volumes:
+		093:       - /var/run/docker.sock:/var/run/docker.sock
+		094:       - ~/.docker/config.json:/config.json:ro
+
+
+Docker Socket Mounted In Container, Severity: HIGH, Results: 1
+Description: Docker socket docker.sock should not be mounted on host. If the docker socket is mounted, it can allow its processes to execute docker commands.
+Platform: DockerCompose
+CWE: 284
+Risk Score: 8.0
+Learn more about this vulnerability: https://docs.kics.io/latest/queries/dockercompose-queries/d6355c88-1e8d-49e9-b2f2-f8a1ca12c75b
+
+	[1]: docker-compose.dev.yaml:93
+
+		092:     volumes:
+		093:       - /var/run/docker.sock:/var/run/docker.sock
+		094:       - ~/.docker/config.json:/config.json:ro
+
+
+
+Results Summary:
+CRITICAL: 0
+HIGH: 2
+MEDIUM: 41
+LOW: 0
+INFO: 4
+TOTAL: 47
+
