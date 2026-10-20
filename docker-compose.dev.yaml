@@ -1,9 +1,37 @@
 services:
   nginx:
     image: nginx:alpine
+    security_opt:
+      - "no-new-privileges:true"
+    # The root master process keeps CHOWN, DAC_OVERRIDE, KILL, SETGID and SETUID to prepare its
+    # temp dirs, read the mounted config, and start and signal the nginx workers.
+    # NET_BIND_SERVICE is dropped: Docker 20.10+ lets containers bind ports below 1024 without it
+    cap_drop:
+      - AUDIT_WRITE
+      - FOWNER
+      - FSETID
+      - MKNOD
+      - NET_BIND_SERVICE
+      - NET_RAW
+      - SETFCAP
+      - SETPCAP
+      - SYS_CHROOT
+    # Accepted (KICS MEDIUM): not bound to 127.0.0.1 so teammates can test from a phone on the same Wi-Fi
+    # kics-scan ignore-line
     ports:
       - "80:80"
       - "443:443"
+    # Checks nginx and the proxy to api; the image has busybox wget
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/api/v1/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    # nginx fails to start if the api upstream cannot be resolved
+    depends_on:
+      api:
+        condition: service_healthy
     volumes:
       - ./nginx/nginx.dev.conf:/etc/nginx/nginx.conf:ro
     networks:
