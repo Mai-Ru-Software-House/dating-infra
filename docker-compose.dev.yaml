@@ -60,28 +60,64 @@ services:
 
   postgres:
     image: postgres:18
+    security_opt:
+      - "no-new-privileges:true"
+    # The entrypoint needs CHOWN, DAC_OVERRIDE, FOWNER, FSETID, SETGID and SETUID to fix
+    # the data directory and switch to the postgres user, so only the rest is dropped
+    cap_drop:
+      - AUDIT_WRITE
+      - KILL
+      - MKNOD
+      - NET_BIND_SERVICE
+      - NET_RAW
+      - SETFCAP
+      - SETPCAP
+      - SYS_CHROOT
     environment:
       POSTGRES_DB: dating_app
       POSTGRES_USER: app
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "app", "-d", "dating_app"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     volumes:
+      # Accepted (KICS INFO, false positive): the rule flags every named volume,
+      # but postgres-data is only used by this service
+      # kics-scan ignore-line
       - postgres-data:/var/lib/postgresql
     networks:
       - internal
 
   rustfs:
     image: rustfs/rustfs:latest
+    security_opt:
+      - "no-new-privileges:true"
+    # Runs as the non-root user rustfs and only binds ports above 1024
+    cap_drop:
+      - ALL
     environment:
       RUSTFS_ACCESS_KEY: ${RUSTFS_ACCESS_KEY}
       RUSTFS_SECRET_KEY: ${RUSTFS_SECRET_KEY}
       RUSTFS_ADDRESS: "0.0.0.0:9000"
       RUSTFS_CONSOLE_ADDRESS: "0.0.0.0:9001"
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://127.0.0.1:9000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     volumes:
+      # Accepted (KICS INFO, false positive): the rule flags every named volume,
+      # but rustfs-data is only used by this service
+      # kics-scan ignore-line
       - rustfs-data:/data
     networks:
       - internal

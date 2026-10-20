@@ -230,7 +230,7 @@ docker compose -f docker-compose.prod.yaml up -d --remove-orphans
 | **Nginx** | `80`, `443` | `80`, `443` | `80`, `443` | `http://localhost/` |
 | **API** | `3000` | `3000` | *internal only* | `http://localhost:3000/api/v1/health` |
 | **Match Engine** | `8000` | `8000` | *internal only* | `http://localhost:8000/health` |
-| **PostgreSQL** | `5432` | `5432` | *internal only* | `postgresql://app@localhost:5432/dating_app` |
-| **RustFS (S3 API)** | `9000` | `9000` | *internal only* | `http://localhost:9000` |
-| **RustFS Console** | `9001` | `9001` | *internal only* | `http://localhost:9001` |
+| **PostgreSQL** | `5432` | `127.0.0.1:5432` | *internal only* | `postgresql://app@localhost:5432/dating_app` |
+| **RustFS (S3 API)** | `9000` | `127.0.0.1:9000` | *internal only* | `http://localhost:9000/health` |
+| **RustFS Console** | `9001` | `127.0.0.1:9001` | *internal only* | `http://localhost:9001` |
 | **Watchtower** | *none* | *none* | *not deployed* | Docker socket daemon `/var/run/docker.sock` |
