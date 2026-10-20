@@ -58,3 +58,64 @@ jobs:
             kics_${{ env.RUN_NAME }}_output.txt
             results/results.json
           if-no-files-found: error
+
+  compose:
+    name: Compose config check
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Create .env from the example
+        run: cp .env.example .env
+
+      - name: Validate both compose files
+        run: |
+          rc=0
+          for f in docker-compose.dev.yaml docker-compose.prod.yaml; do
+            echo "== $f"
+            if ! docker compose -f "$f" config --quiet; then
+              echo "::error file=$f::docker compose config failed"
+              rc=1
+            fi
+          done
+          exit $rc
+
+  smoke:
+    name: Dev stack smoke test
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Create .env from the example
+        run: cp .env.example .env
+
+      # watchtower mounts ~/.docker/config.json; without the file Docker would create a directory there
+      - name: Create an empty Docker config for watchtower
+        run: |
+          mkdir -p ~/.docker
+          [ -f ~/.docker/config.json ] || echo '{}' > ~/.docker/config.json
+
+      - name: Start the dev stack and wait until every service is healthy
+        run: docker compose -f docker-compose.dev.yaml up -d --wait --wait-timeout 240
+
+      - name: Check the health endpoints
+        run: |
+          curl -fsS --retry 5 --retry-all-errors http://localhost:3000/api/v1/health && echo
+          curl -fsS --retry 5 --retry-all-errors http://localhost:8000/health && echo
+          curl -fsS --retry 5 --retry-all-errors http://localhost/api/v1/health && echo
+
+      - name: Show service status and logs
+        if: ${{ always() }}
+        run: |
+          docker compose -f docker-compose.dev.yaml ps -a
+          docker compose -f docker-compose.dev.yaml logs --no-color --tail 50
+
+      - name: Stop the dev stack
+        if: ${{ always() }}
+        run: docker compose -f docker-compose.dev.yaml down

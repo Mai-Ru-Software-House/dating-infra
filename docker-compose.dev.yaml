@@ -89,7 +89,34 @@ services:
   watchtower:
     image: containrrr/watchtower
     restart: unless-stopped
+    security_opt:
+      - "no-new-privileges:true"
+    # Keeps only DAC_OVERRIDE: watchtower runs as root and must read the mounted
+    # ~/.docker/config.json, which is usually mode 600 and owned by the host user
+    cap_drop:
+      - AUDIT_WRITE
+      - CHOWN
+      - FOWNER
+      - FSETID
+      - KILL
+      - MKNOD
+      - NET_BIND_SERVICE
+      - NET_RAW
+      - SETFCAP
+      - SETGID
+      - SETPCAP
+      - SETUID
+      - SYS_CHROOT
+    healthcheck:
+      test: ["CMD", "/watchtower", "--health-check"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     volumes:
+      # Accepted (KICS HIGH): watchtower needs the Docker socket to restart dev containers
+      # when new images are pushed. Dev only, prod has no watchtower.
+      # kics-scan ignore-line
       - /var/run/docker.sock:/var/run/docker.sock
       - ~/.docker/config.json:/config.json:ro
     environment:
