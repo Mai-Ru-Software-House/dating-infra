@@ -12,8 +12,28 @@ services:
 
   api:
     image: ${BACKEND_IMAGE}
+    security_opt:
+      - "no-new-privileges:true"
+    # Runs as the non-root user bun and only binds port 3000
+    cap_drop:
+      - ALL
+    # Accepted (KICS MEDIUM): not bound to 127.0.0.1 so teammates can test from a phone on the same Wi-Fi
+    # kics-scan ignore-line
     ports:
       - "3000:3000"
+    # The image has no curl or wget, so bun does the request
+    healthcheck:
+      test: ["CMD", "bun", "-e", "fetch('http://127.0.0.1:3000/api/v1/health').then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    # Migrations run when the container starts, so the database must be ready first
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rustfs:
+        condition: service_healthy
     environment:
       NODE_ENV: development
       PORT: 3000
@@ -46,8 +66,22 @@ services:
 
   match-engine:
     image: ${MATCH_ENGINE_IMAGE}
+    security_opt:
+      - "no-new-privileges:true"
+    # Only binds port 8000 and reads root-owned files, so it needs no capabilities
+    cap_drop:
+      - ALL
+    # Accepted (KICS MEDIUM): not bound to 127.0.0.1 so teammates can test from a phone on the same Wi-Fi
+    # kics-scan ignore-line
     ports:
       - "8000:8000"
+    # The image has no curl or wget, so python does the request
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=4)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     environment:
       ENVIRONMENT: development
       PORT: 8000
