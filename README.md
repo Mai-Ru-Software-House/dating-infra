@@ -140,7 +140,7 @@ These are not in `.env.example`. Both compose files give them the default below,
 | `REFRESH_TOKEN_TTL_DAYS` | Life of a refresh token, in days | `30` |
 | `MATCH_ENGINE_TIMEOUT_MS` | How long the API waits for the Match Engine, in milliseconds | `5000` |
 
-Both Nginx files set `client_max_body_size 2m;`, so a 1 MB photo upload reaches the backend. The backend itself refuses a request body over 2 MiB.
+Both Nginx files set `client_max_body_size 6m;`, so a 5 MB photo upload reaches the backend. The backend itself refuses a request body over 6 MiB.
 
 > [!WARNING]
 > Real passwords, API keys, and certificate files must **never** be committed to version control. The `.gitignore` file enforces this exclusion.
