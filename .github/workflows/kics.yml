@@ -48,7 +48,7 @@ jobs:
             "$KICS_IMAGE" scan -p /path \
             --no-color --no-progress \
             --fail-on critical,high \
-            --exclude-paths static-analysis/ \
+            --exclude-paths quality_assessment/ \
             -o /path/results --report-formats json \
             2>&1 | tee "kics_${RUN_NAME}_output.txt"
 
