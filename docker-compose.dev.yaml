@@ -213,11 +213,12 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
+    # Accepted (KICS HIGH): watchtower needs the Docker socket to restart dev containers
+    # when new images are pushed. Dev only, prod has no watchtower.
+    # KICS 2.1.20 only honors the ignore comment on a list item when it is a single line
+    # and the item is not the first one, so keep docker.sock second and the reason here
     volumes:
       - ~/.docker/config.json:/config.json:ro
-      # Accepted (KICS HIGH): watchtower needs the Docker socket to restart dev containers
-      # when new images are pushed. Dev only, prod has no watchtower.
-      # Keep this mount second: KICS 2.1.20 skips a kics-scan comment above the first list item
       # kics-scan ignore-line
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
