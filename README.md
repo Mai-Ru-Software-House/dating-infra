@@ -18,6 +18,7 @@ Centralized Docker container orchestration, network routing, and local/productio
   - [Development Environment](#development-environment)
   - [Production Environment](#production-environment)
   - [Releasing](#releasing)
+  - [Deploying to the demo host](#deploying-to-the-demo-host)
 - [Service Registry & Port Mappings](#service-registry--port-mappings)
 
 ---
@@ -296,6 +297,31 @@ docker compose -f docker-compose.prod.yaml start api nginx
 3. Push the tag `vX.Y.Z` here. `.github/workflows/release.yml` checks that the tag matches `.env.example`, builds the kit from an explicit file list (with the API contract from the `dating-backend` tag and `docs/APP-GUIDE.md`), checks that no secrets or development files are inside, and publishes the GitHub Release with the zip, the tar.gz and `SHA256SUMS`.
 
 Not shipped in the kit: `docker-compose.dev.yaml`, `nginx.dev.conf`, Watchtower, `quality_assessment/`, `.github/` and any `.env` or key file.
+
+---
+
+### Deploying to the demo host
+
+`.github/workflows/deploy.yml` deploys a published release to the demo host, which is only reachable on the Tailscale network. Start it by hand: **Actions > Deploy > Run workflow**, enter the version (such as `1.0.1`, no `v`), and approve the run when GitHub asks (the `production` environment requires a reviewer).
+
+What the run does:
+
+1. Checks that the kit release and both `X.Y.Z` images exist.
+2. Joins the tailnet as a temporary node tagged `tag:ci`. The tailnet policy lets that tag reach the demo host on port 22 and nothing else.
+3. Copies `.github/scripts/remote-deploy.sh` to the host over SSH and runs it. The script finds the running kit, downloads the new kit and checks its SHA-256, carries `.env` and the certificate over, runs `scripts/upgrade.sh` (backup first) and then `scripts/smoke-test.sh` on the host. If either fails it starts the previous kit again and says whether the database might need a restore from `backups/`.
+
+The old kit folders stay in `/shared`; delete the ones you no longer need. The deploy key is an ordinary SSH login of the deploy user, who is in the `docker` group, so it is root-equivalent on the host: it only exists in the `production` environment secrets, and only the tailnet policy lets the runner reach the host.
+
+One-time setup:
+
+| Where | What |
+|---|---|
+| Tailscale policy | `tag:ci` may reach the demo host on `tcp:22` only (grant), with `tests` that fail the policy if that changes |
+| Tailscale | An OAuth client with the `auth_keys` write scope and the tag `tag:ci` |
+| Demo host | The public half of the deploy key in the deploy user's `~/.ssh/authorized_keys` |
+| GitHub environment `production` | Required reviewer; deployments only from `main`. Secrets `TS_OAUTH_CLIENT_ID`, `TS_OAUTH_SECRET`, `DEPLOY_SSH_KEY`. Variables `DEPLOY_HOST` (the host's tailnet IP), `DEPLOY_USER`, `DEPLOY_HOST_KEY` (its `ssh-keyscan` line, so the host is pinned) |
+
+The certificate from `tailscale cert` lasts about 90 days. Renew it before it expires and run `scripts/install.sh` again (or restart nginx) so the new files are used.
 
 ---
 

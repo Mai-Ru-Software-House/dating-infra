@@ -1,0 +1,94 @@
+name: Deploy
+
+# Deploys a published release (kit and images) to the demo host, which is only reachable on the
+# Tailscale network. The job joins the tailnet as a temporary node tagged tag:ci, SSHes to the
+# host and runs .github/scripts/remote-deploy.sh there. Start it by hand from the Actions tab.
+# The production environment holds the secrets and requires an approval before the job runs.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release to deploy, such as 1.0.0 (no v). Its images and kit must already be published"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to the demo host
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    environment: production
+    env:
+      VERSION: ${{ inputs.version }}
+      DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+      DEPLOY_USER: ${{ vars.DEPLOY_USER }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Check the version and the release
+        run: |
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Version looks like 1.0.0, got '$VERSION'"
+            exit 1
+          fi
+          url="https://github.com/${GITHUB_REPOSITORY}/releases/download/v${VERSION}/SHA256SUMS"
+          if ! curl -fsSL -o /dev/null "$url"; then
+            echo "::error::Release v$VERSION of the server kit does not exist yet ($url)"
+            exit 1
+          fi
+          for image in dating-backend dating-match-engine; do
+            token=$(curl -fsS "https://ghcr.io/token?scope=repository:mai-ru-software-house/$image:pull" | jq -r .token)
+            code=$(curl -s -o /dev/null -w '%{http_code}' -H "Authorization: Bearer $token" \
+              -H "Accept: application/vnd.oci.image.index.v1+json,application/vnd.docker.distribution.manifest.v2+json" \
+              "https://ghcr.io/v2/mai-ru-software-house/$image/manifests/$VERSION")
+            if [ "$code" != 200 ]; then
+              echo "::error::Image $image:$VERSION is not in GHCR (HTTP $code). Tag that repository first"
+              exit 1
+            fi
+          done
+
+      # The temporary node can reach the demo host on port 22 and nothing else (tailnet policy)
+      - name: Join the tailnet
+        uses: tailscale/github-action@99a8333667fff04fdd6cffb46dfd409f8329a7bf # v4.3.0
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:ci
+          ping: ${{ vars.DEPLOY_HOST }}
+
+      - name: Prepare SSH
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_HOST_KEY: ${{ vars.DEPLOY_HOST_KEY }}
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          # The host key is pinned, so a wrong machine on that address is refused
+          printf '%s\n' "$DEPLOY_HOST_KEY" > ~/.ssh/known_hosts
+
+      # The script is copied over and run as a file: run through "bash -s" it would share
+      # standard input with the docker commands inside it
+      - name: Deploy
+        run: |
+          ssh_opts=(-i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o BatchMode=yes -o ConnectTimeout=20)
+          remote="$DEPLOY_USER@$DEPLOY_HOST"
+          script=$(ssh "${ssh_opts[@]}" "$remote" 'mktemp /tmp/mairu-deploy.XXXXXX')
+          # The remote commands are built here on purpose: a temp path and a checked version
+          upload_cmd="cat > $script"
+          run_cmd="bash $script $VERSION </dev/null; rc=\$?; rm -f $script; exit \$rc"
+          # shellcheck disable=SC2029
+          ssh "${ssh_opts[@]}" "$remote" "$upload_cmd" < .github/scripts/remote-deploy.sh
+          # shellcheck disable=SC2029
+          ssh "${ssh_opts[@]}" "$remote" "$run_cmd"

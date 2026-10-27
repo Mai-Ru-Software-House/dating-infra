@@ -96,7 +96,7 @@ jobs:
           persist-credentials: false
 
       - name: ShellCheck
-        run: shellcheck -x scripts/*.sh
+        run: shellcheck -x scripts/*.sh .github/scripts/*.sh
 
   smoke:
     name: Dev stack smoke test
