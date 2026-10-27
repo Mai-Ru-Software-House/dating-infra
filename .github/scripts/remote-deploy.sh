@@ -41,7 +41,9 @@ if [ "$target" != "$active" ]; then
     curl -fsSL "$base/v$version/SHA256SUMS" -o "$tmp/SHA256SUMS" || die "Could not download SHA256SUMS"
     expected=$(awk -v f="$archive" '$2 == f { print $1 }' "$tmp/SHA256SUMS")
     actual=$(sha256sum "$tmp/$archive" | cut -d ' ' -f 1)
-    [ -n "$expected" ] && [ "$expected" = "$actual" ] || die "Checksum mismatch for $archive"
+    if [ -z "$expected" ] || [ "$expected" != "$actual" ]; then
+      die "Checksum mismatch for $archive"
+    fi
     tar -xzf "$tmp/$archive" -C "$root"
     [ -d "$target" ] || die "The archive did not contain mairu-server-$version/"
   fi
