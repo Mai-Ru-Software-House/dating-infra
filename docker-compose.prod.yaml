@@ -1,6 +1,11 @@
+# Fixed project name: volume and network names must not depend on the folder the kit is
+# unpacked into, or an upgrade from a new folder would start on empty volumes
+name: mairu
+
 services:
   nginx:
     image: nginx:alpine
+    restart: unless-stopped
     security_opt:
       - "no-new-privileges:true"
     # The root master process keeps CHOWN, DAC_OVERRIDE, KILL, SETGID and SETUID to prepare its
@@ -16,14 +21,14 @@ services:
       - SETFCAP
       - SETPCAP
       - SYS_CHROOT
-    # Accepted (KICS MEDIUM): public gateway, 80 and 443 must be open to the internet
+    # Accepted (KICS MEDIUM): public gateway, 80 and 443 must be open to the internet (443 only answers with a certificate)
     # kics-scan ignore-line
     ports:
       - "80:80"
       - "443:443"
-    # Checks nginx and the proxy to api; the image has busybox wget
+    # Checks nginx and the proxy to api through the loopback-only server block; the image has busybox wget
     healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/api/v1/health"]
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8081/api/v1/health"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -34,7 +39,10 @@ services:
       match-engine:
         condition: service_healthy
     volumes:
-      - ./nginx/nginx.prod.conf:/etc/nginx/nginx.conf:ro
+      # NGINX_CONF picks the config. scripts/install sets it: nginx.prod.conf when a certificate is
+      # in nginx/certs/ (HTTPS, port 80 redirects), nginx.prod.http.conf otherwise (plain HTTP)
+      - ${NGINX_CONF:-./nginx/nginx.prod.http.conf}:/etc/nginx/nginx.conf:ro
+      - ./nginx/api-proxy.inc:/etc/nginx/api-proxy.inc:ro
       - ./nginx/certs:/etc/nginx/certs:ro
     networks:
       - public
@@ -42,6 +50,7 @@ services:
 
   api:
     image: ${BACKEND_IMAGE}
+    restart: unless-stopped
     security_opt:
       - "no-new-privileges:true"
     # Runs as the non-root user bun and only binds port 3000
@@ -94,6 +103,7 @@ services:
   # each other at request time (depending both ways is a cycle and prod cannot start)
   match-engine:
     image: ${MATCH_ENGINE_IMAGE}
+    restart: unless-stopped
     security_opt:
       - "no-new-privileges:true"
     # Only binds port 8000 and reads root-owned files, so it needs no capabilities
@@ -116,6 +126,7 @@ services:
 
   postgres:
     image: postgres:18
+    restart: unless-stopped
     security_opt:
       - "no-new-privileges:true"
     # The entrypoint needs CHOWN, DAC_OVERRIDE, FOWNER, FSETID, SETGID and SETUID to fix
@@ -149,7 +160,8 @@ services:
       - internal
 
   rustfs:
-    image: rustfs/rustfs:latest
+    image: rustfs/rustfs:1.0.4
+    restart: unless-stopped
     security_opt:
       - "no-new-privileges:true"
     # Runs as the non-root user rustfs and only binds ports above 1024
