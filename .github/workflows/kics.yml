@@ -86,6 +86,18 @@ jobs:
           done
           exit $rc
 
+  scripts:
+    name: Shell script check
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: ShellCheck
+        run: shellcheck -x scripts/*.sh
+
   smoke:
     name: Dev stack smoke test
     runs-on: ubuntu-24.04
@@ -95,8 +107,12 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Create .env from the example
-        run: cp .env.example .env
+      # .env.example points at the release images; the dev stack follows the :dev images
+      - name: Create .env from the example, using the dev images
+        run: |
+          cp .env.example .env
+          sed -i -E 's#^(BACKEND_IMAGE|MATCH_ENGINE_IMAGE)=(.*):[^:]+$#\1=\2:dev#' .env
+          grep IMAGE .env
 
       # watchtower mounts ~/.docker/config.json; without the file Docker would create a directory there
       - name: Create an empty Docker config for watchtower

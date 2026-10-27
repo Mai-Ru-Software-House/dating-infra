@@ -1,0 +1,88 @@
+name: Release
+
+# A git tag vX.Y.Z builds the server kit (mairu-server-X.Y.Z.zip and .tar.gz, with SHA256SUMS)
+# and attaches it to a GitHub Release. Tag dating-backend and dating-match-engine first: the
+# kit points at their X.Y.Z images and carries the API contract from the backend tag.
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: read
+
+jobs:
+  kit:
+    name: Build and publish the server kit
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    env:
+      TAG: ${{ github.ref_name }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Check the tag against the image tags in .env.example
+        run: |
+          if ! [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Release tags look like v1.0.0, got $TAG"
+            exit 1
+          fi
+          version="${TAG#v}"
+          for key in BACKEND_IMAGE MATCH_ENGINE_IMAGE; do
+            image=$(sed -n "s/^$key=//p" .env.example)
+            if [ "${image##*:}" != "$version" ]; then
+              echo "::error file=.env.example::$key is $image, expected the tag $version"
+              exit 1
+            fi
+          done
+
+      - name: Checkout the API contract from dating-backend
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: Mai-Ru-Software-House/dating-backend
+          ref: ${{ github.ref_name }}
+          path: backend-src
+          sparse-checkout: docs/api-contract.md
+          persist-credentials: false
+
+      # Files are copied from an explicit list, so nothing else can slip into the kit
+      - name: Build the kit
+        run: |
+          version="${TAG#v}"
+          kit="mairu-server-$version"
+          mkdir -p "$kit/nginx/certs" "$kit/scripts" "$kit/docs"
+          cp docker-compose.prod.yaml .env.example README.md "$kit/"
+          echo "$version" > "$kit/VERSION"
+          cp nginx/nginx.prod.conf nginx/nginx.prod.http.conf nginx/api-proxy.inc "$kit/nginx/"
+          cp nginx/certs/.gitkeep "$kit/nginx/certs/"
+          cp scripts/*.sh scripts/*.ps1 "$kit/scripts/"
+          chmod +x "$kit"/scripts/*.sh
+          cp docs/APP-GUIDE.md backend-src/docs/api-contract.md "$kit/docs/"
+
+          # Nothing secret or development-only may be in the kit (deployment test DT05)
+          leaked=$(find "$kit" \( -name '.env' -o -name '*.key' -o -name '*.crt' -o -name '*.pem' -o -name '*dev*' -o -name 'quality_assessment' -o -name '.github' -o -name 'test*' \) -print)
+          if [ -n "$leaked" ]; then
+            echo "::error::Unexpected files in the kit:"
+            echo "$leaked"
+            exit 1
+          fi
+
+          zip -qr "$kit.zip" "$kit"
+          tar czf "$kit.tar.gz" "$kit"
+          sha256sum "$kit.zip" "$kit.tar.gz" > SHA256SUMS
+          cat SHA256SUMS
+
+      - name: Publish the GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${TAG#v}"
+          gh release create "$TAG" \
+            "mairu-server-$version.zip" "mairu-server-$version.tar.gz" SHA256SUMS \
+            --title "Mai Ru server kit $version" \
+            --generate-notes

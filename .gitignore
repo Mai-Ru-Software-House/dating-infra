@@ -21,3 +21,6 @@ nginx/certs/*.pem
 # Docker volumes and persistent state
 postgres-data/
 rustfs-data/
+
+# Backups written by scripts/backup (database dumps and photo archives)
+backups/
